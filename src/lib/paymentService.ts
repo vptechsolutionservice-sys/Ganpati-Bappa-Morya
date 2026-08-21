@@ -30,6 +30,7 @@ export async function getPaymentSettings(): Promise<PaymentSettings> {
       'payment_instructions',
       'support_contact',
       'payment_note',
+      'payment_qr_url',
     ]);
 
   if (error || !data) {
@@ -51,6 +52,7 @@ export async function getPaymentSettings(): Promise<PaymentSettings> {
     payment_instructions: map.payment_instructions || '',
     support_contact: map.support_contact || '',
     payment_note: map.payment_note || '',
+    payment_qr_url: map.payment_qr_url || undefined,
   };
 }
 
@@ -83,7 +85,6 @@ export async function isTransactionIdUsed(transactionId: string): Promise<boolea
   return !!data;
 }
 
-// ─── UPLOAD SCREENSHOT ────────────────────────────────────────
 export async function uploadPaymentScreenshot(file: File, paymentRef: string): Promise<string | null> {
   // Compress if > 2MB using canvas
   let uploadFile = file;
@@ -102,6 +103,28 @@ export async function uploadPaymentScreenshot(file: File, paymentRef: string): P
 
   const { data: { publicUrl } } = supabase.storage
     .from('payment-screenshots')
+    .getPublicUrl(data.path);
+
+  return publicUrl;
+}
+
+export async function uploadPaymentQRCode(file: File): Promise<string | null> {
+  let uploadFile = file;
+  if (file.size > 2 * 1024 * 1024 && file.type.startsWith('image/')) {
+    uploadFile = await compressImage(file, 0.7) || file;
+  }
+
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `payment-qr-${Date.now()}.${ext}`;
+
+  const { data, error } = await supabase.storage
+    .from('invitation-assets')
+    .upload(path, uploadFile, { upsert: true });
+
+  if (error || !data) return null;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('invitation-assets')
     .getPublicUrl(data.path);
 
   return publicUrl;

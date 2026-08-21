@@ -252,7 +252,11 @@ export default function PaymentPage() {
             <h2 className="font-bold font-devanagari mb-1" style={{ color: '#3d1f00' }}>📱 Scan & Pay</h2>
             <p className="text-xs text-amber-600 mb-5">Google Pay, PhonePe, Paytm, BHIM कोणत्याही UPI app ने scan करा</p>
 
-            <QRCanvas value={upiUrl} />
+            {settings?.payment_qr_url ? (
+              <img src={settings.payment_qr_url} alt="Payment QR" className="rounded-2xl shadow-lg mx-auto block max-w-[220px]" style={{ border: '3px solid rgba(212,160,23,0.4)' }} />
+            ) : (
+              <QRCanvas value={upiUrl} />
+            )}
 
             <div className="mt-4">
               <p className="text-3xl font-bold" style={{ color: '#ff7300' }}>₹{price}</p>

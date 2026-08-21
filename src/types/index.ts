@@ -59,6 +59,7 @@ export interface PaymentSettings {
   payment_instructions: string;
   support_contact: string;
   payment_note: string;
+  payment_qr_url?: string;
 }
 
 export interface RevenueStats {

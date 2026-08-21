@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Save, AlertCircle } from 'lucide-react';
+import { Save, AlertCircle, Upload, X } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { showToast } from '../../components/ui/Toaster';
 import { useAuth } from '../../contexts/AuthContext';
+import { uploadPaymentQRCode } from '../../lib/paymentService';
 
 const SETTINGS_CONFIG = [
   { key: 'invitation_price', label: 'Invitation Price (₹)', type: 'number', placeholder: '50', hint: 'Default ₹50 per invitation' },
@@ -21,6 +22,10 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [qrFile, setQrFile] = useState<File | null>(null);
+  const [qrPreview, setQrPreview] = useState<string | null>(null);
+  const qrInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => { load(); }, []);
 
   async function load() {
@@ -30,8 +35,30 @@ export default function AdminSettings() {
       setSettings(map);
       setInstructions(map.payment_instructions || '');
       setPaymentNote(map.payment_note || '');
+      setQrPreview(map.payment_qr_url || null);
     }
     setLoading(false);
+  }
+
+  function handleQrFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showToast('Only JPG, PNG, WebP allowed', 'error'); return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('File must be under 2MB', 'error'); return;
+    }
+    setQrFile(file);
+    setQrPreview(URL.createObjectURL(file));
+  }
+
+  function removeQrCode() {
+    setQrFile(null);
+    setQrPreview(null);
+    if (qrInputRef.current) qrInputRef.current.value = '';
+    // Optional: mark for deletion on save
+    updateField('payment_qr_url', '');
   }
 
   function updateField(key: string, value: string) {
@@ -40,10 +67,27 @@ export default function AdminSettings() {
 
   async function save() {
     setSaving(true);
+    let qrUrl = settings.payment_qr_url || '';
+    
+    if (qrFile) {
+      const uploadedUrl = await uploadPaymentQRCode(qrFile);
+      if (uploadedUrl) {
+        qrUrl = uploadedUrl;
+      } else {
+        showToast('Failed to upload QR Code', 'error');
+        setSaving(false);
+        return;
+      }
+    } else if (qrPreview === null) {
+      // User removed QR
+      qrUrl = '';
+    }
+
     const updates = [
       ...SETTINGS_CONFIG.map(c => ({ key: c.key, value: settings[c.key] || '' })),
       { key: 'payment_instructions', value: instructions },
       { key: 'payment_note', value: paymentNote },
+      { key: 'payment_qr_url', value: qrUrl },
     ];
 
     const errors: string[] = [];
@@ -116,6 +160,34 @@ export default function AdminSettings() {
                   <p className="text-xs text-amber-500 mt-1">{cfg.hint}</p>
                 </div>
               ))}
+
+              {/* QR Code Upload */}
+              <div className="mt-6">
+                <label className="block text-sm font-semibold mb-1.5" style={{ color: '#3d1f00' }}>
+                  Custom Payment QR Code <span className="text-amber-500 text-xs font-normal">(Optional)</span>
+                </label>
+                <p className="text-xs text-amber-600 mb-3">If uploaded, this will be shown instead of the generated UPI QR.</p>
+                {qrPreview ? (
+                  <div className="relative w-48 mx-auto">
+                    <img src={qrPreview} alt="QR Preview" className="w-full object-contain rounded-xl border-2"
+                      style={{ borderColor: 'rgba(212,160,23,0.3)' }} />
+                    <button type="button" onClick={removeQrCode}
+                      className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => qrInputRef.current?.click()}
+                    className="w-full py-6 rounded-xl border-2 border-dashed flex flex-col items-center gap-2 transition-all hover:bg-amber-50"
+                    style={{ borderColor: 'rgba(212,160,23,0.4)', color: '#a07050' }}>
+                    <Upload className="w-6 h-6" />
+                    <span className="text-sm font-medium">Tap to upload QR Code</span>
+                    <span className="text-xs text-amber-400">JPG, PNG, WebP • Max 2MB</span>
+                  </button>
+                )}
+                <input ref={qrInputRef} type="file" accept="image/jpeg,image/png,image/webp"
+                  onChange={handleQrFileSelect} className="hidden" />
+              </div>
 
               {/* Price note */}
               <div className="p-3 rounded-xl text-xs"
