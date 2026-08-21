@@ -12,14 +12,14 @@ interface GuestRow {
   slug: string;
   invitation_id: string;
   invitation_host: string;
-  rsvp?: { response: string; guest_count: number };
+  rsvp?: { status: string; attendee_count: number };
   viewed: boolean;
 }
 
 const RSVP_LABELS: Record<string, { label: string; color: string }> = {
-  yes: { label: 'नक्की येणार', color: '#27ae60' },
-  maybe: { label: 'प्रयत्न करतोय', color: '#f39c12' },
-  no: { label: 'येणार नाही', color: '#e74c3c' },
+  COMING: { label: 'नक्की येणार', color: '#27ae60' },
+  MAYBE: { label: 'कदाचित येऊ', color: '#f39c12' },
+  NOT_ATTENDING: { label: 'येणार नाही', color: '#e74c3c' },
 };
 
 export default function DashboardGuests() {
@@ -47,8 +47,8 @@ export default function DashboardGuests() {
       supabase.from('invitation_views').select('guest_id').in('invitation_id', invIds).not('guest_id', 'is', null),
     ]);
 
-    const rsvpMap = Object.fromEntries((rsvpRes.data || []).map(r => [r.guest_id, r]));
-    const viewedSet = new Set((viewRes.data || []).map(v => v.guest_id));
+    const rsvpMap = Object.fromEntries((rsvpRes.data || []).map((r: any) => [r.guest_token, r]));
+    const viewedSet = new Set((viewRes.data || []).map((v: any) => v.guest_id));
     const invMap = Object.fromEntries(invs.map(i => [i.id, i.host_name]));
 
     const rows: GuestRow[] = (guestRes.data || []).map(g => ({
@@ -117,13 +117,13 @@ export default function DashboardGuests() {
                       <td className="px-4 py-3">
                         {g.rsvp ? (
                           <span className="px-2 py-1 rounded-full text-xs font-medium text-white"
-                            style={{ background: RSVP_LABELS[g.rsvp.response]?.color || '#95a5a6' }}>
-                            {RSVP_LABELS[g.rsvp.response]?.label || g.rsvp.response}
+                            style={{ background: RSVP_LABELS[g.rsvp.status]?.color || '#95a5a6' }}>
+                            {RSVP_LABELS[g.rsvp.status]?.label || g.rsvp.status}
                           </span>
                         ) : <span className="text-xs text-amber-400">—</span>}
                       </td>
                       <td className="px-4 py-3 text-center font-medium" style={{ color: '#3d1f00' }}>
-                        {g.rsvp?.guest_count || '—'}
+                        {g.rsvp?.attendee_count || '—'}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {g.viewed ? <span className="text-green-500 text-xs">✓ Yes</span> : <span className="text-amber-400 text-xs">—</span>}

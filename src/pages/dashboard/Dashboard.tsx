@@ -43,13 +43,13 @@ export default function Dashboard() {
       const [views, shares, rsvps, flowers, diyas, recent] = await Promise.all([
         invIds.length ? supabase.from('invitation_views').select('*', { count: 'exact', head: true }).in('invitation_id', invIds) : { count: 0 },
         invIds.length ? supabase.from('invitation_shares').select('*', { count: 'exact', head: true }).in('invitation_id', invIds) : { count: 0 },
-        invIds.length ? supabase.from('rsvps').select('guest_count').eq('response', 'yes').in('invitation_id', invIds) : { data: [] },
+        invIds.length ? supabase.from('rsvps').select('attendee_count').eq('status', 'COMING').in('invitation_id', invIds) : { data: [] },
         invIds.length ? supabase.from('flower_offerings').select('*', { count: 'exact', head: true }).in('invitation_id', invIds) : { count: 0 },
         invIds.length ? supabase.from('diya_offerings').select('*', { count: 'exact', head: true }).in('invitation_id', invIds) : { count: 0 },
         supabase.from('invitations').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5),
       ]);
 
-      const guestCount = (rsvps.data || []).reduce((sum, r) => sum + (r.guest_count || 0), 0);
+      const guestCount = (rsvps.data || []).reduce((sum: number, r: any) => sum + (r.attendee_count || 0), 0);
 
       setStats({
         total_invitations: invIds.length,

@@ -25,7 +25,7 @@ export default function DashboardAnalytics() {
       supabase.from('invitation_shares').select('invitation_id').in('invitation_id', invIds),
       supabase.from('flower_offerings').select('invitation_id').in('invitation_id', invIds),
       supabase.from('diya_offerings').select('invitation_id').in('invitation_id', invIds),
-      supabase.from('rsvps').select('invitation_id, response, guest_count').in('invitation_id', invIds),
+      supabase.from('rsvps').select('invitation_id, status, attendee_count').in('invitation_id', invIds),
     ]);
 
     const countBy = (arr: any[], key: string) => {
@@ -49,9 +49,9 @@ export default function DashboardAnalytics() {
     setAnalytics(rows);
 
     // RSVP pie
-    const yesCount = (rsvpRes.data || []).filter(r => r.response === 'yes').length;
-    const maybeCount = (rsvpRes.data || []).filter(r => r.response === 'maybe').length;
-    const noCount = (rsvpRes.data || []).filter(r => r.response === 'no').length;
+    const yesCount = (rsvpRes.data || []).filter((r: any) => r.status === 'COMING').length;
+    const maybeCount = (rsvpRes.data || []).filter((r: any) => r.status === 'MAYBE').length;
+    const noCount = (rsvpRes.data || []).filter((r: any) => r.status === 'NOT_ATTENDING').length;
     setRsvpData([
       { name: 'नक्की येणार', value: yesCount, color: '#27ae60' },
       { name: 'प्रयत्न करतोय', value: maybeCount, color: '#f39c12' },

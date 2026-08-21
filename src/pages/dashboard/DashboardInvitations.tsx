@@ -84,6 +84,10 @@ export default function DashboardInvitations() {
                     className="p-2 rounded-lg hover:bg-amber-100 transition-colors" title="Preview">
                     <Eye className="w-4 h-4 text-amber-600" />
                   </Link>
+                  <Link to={`/dashboard/invitations/${inv.id}/rsvp`}
+                    className="p-2 rounded-lg hover:bg-green-50 transition-colors" title="RSVP Dashboard">
+                    <span className="text-sm">🙏</span>
+                  </Link>
                   <button onClick={() => copyLink(inv.slug)} className="p-2 rounded-lg hover:bg-amber-100" title="Copy link">
                     {copiedSlug === inv.slug ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-amber-600" />}
                   </button>

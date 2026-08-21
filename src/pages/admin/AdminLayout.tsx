@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, Users, FileText, Palette, Image, BarChart3, Home, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { showToast } from '../../components/ui/Toaster';
 
 const NAV_ITEMS = [
-  { to: '/admin', icon: Home, label: 'Dashboard', icon2: '📊' },
-  { to: '/admin/users', icon: Users, label: 'Users', icon2: '👥' },
-  { to: '/admin/invitations', icon: FileText, label: 'Invitations', icon2: '📜' },
-  { to: '/admin/templates', icon: Palette, label: 'Templates', icon2: '🎨' },
-  { to: '/admin/images', icon: Image, label: 'Images', icon2: '🖼️' },
+  { to: '/admin',                  label: 'Dashboard',        icon2: '📊' },
+  { to: '/admin/payments',         label: 'Payments',         icon2: '💳' },
+  { to: '/admin/payments/history', label: 'Payment History',  icon2: '📋' },
+  { to: '/admin/users',            label: 'Users',            icon2: '👥' },
+  { to: '/admin/invitations',      label: 'Invitations',      icon2: '📜' },
+  { to: '/admin/templates',        label: 'Templates',        icon2: '🎨' },
+  { to: '/admin/images',           label: 'Images',           icon2: '🖼️' },
+  { to: '/admin/settings',         label: 'Settings',         icon2: '⚙️' },
 ];
 
 interface AdminLayoutProps { children: React.ReactNode }

@@ -6,10 +6,12 @@ import type { Invitation } from '../types';
 import InvitationCard from '../components/ganpati/InvitationCard';
 import FlowerOffering from '../components/ganpati/FlowerOffering';
 import DiyaOffering from '../components/ganpati/DiyaOffering';
-import RSVPCard from '../components/ganpati/RSVPCard';
+import RSVPSection from '../components/rsvp/RSVPSection';
 import LocationCard from '../components/ganpati/LocationCard';
 import ShareButtons from '../components/ganpati/ShareButtons';
 import LoadingScreen from '../components/ui/LoadingScreen';
+
+const DEMO_SLUG = 'demo-invitation-2026';
 
 // ─── INTRO SEQUENCE ────────────────────────────────────────────────────
 type IntroScreen = 1 | 2 | 3 | 4 | 5 | 6;
@@ -238,6 +240,14 @@ export default function InvitationView() {
   if (notFound) return <NotFoundPage />;
   if (!invitation) return null;
 
+  // Payment gate — only show full view if unlocked (or demo)
+  const isDemo = slug === DEMO_SLUG;
+  const isUnlocked = isDemo || invitation.is_unlocked === true || invitation.is_unlocked === undefined;
+
+  if (!isUnlocked) {
+    return <LockedInvitationScreen invitation={invitation} />;
+  }
+
   return (
     <>
       {/* Intro */}
@@ -294,7 +304,7 @@ export default function InvitationView() {
 
               {/* RSVP */}
               <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.35 }}>
-                <RSVPCard invitationId={invitation.id} guestId={guestId} guestName={guestName} />
+                <RSVPSection invitation={invitation} guestToken={guestId} guestName={guestName} />
               </motion.div>
 
               {/* Location */}
@@ -345,6 +355,8 @@ export default function InvitationView() {
                     guestName={guestName}
                     arrivalDate={invitation.arrival_date}
                     city={invitation.city}
+                    isUnlocked={invitation.is_unlocked !== false}
+                    paymentInvitationId={invitation.id}
                   />
                 </div>
               </motion.div>
@@ -390,6 +402,55 @@ export default function InvitationView() {
         </div>
       )}
     </>
+  );
+}
+
+// ─── LOCKED INVITATION SCREEN ──────────────────────────────────
+function LockedInvitationScreen({ invitation }: { invitation: Invitation }) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16 text-center"
+      style={{ background: 'radial-gradient(ellipse at top, #fff8f0 0%, #fdf0dc 100%)' }}>
+      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring' }}>
+        <div className="text-6xl mb-4">🙏</div>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-sm font-semibold"
+          style={{ background: 'rgba(255,115,0,0.1)', color: '#c05000', border: '1px solid rgba(255,115,0,0.2)' }}>
+          🔒 Invitation Processing
+        </div>
+        <h1 className="text-2xl font-bold font-devanagari mb-3" style={{ color: '#3d1f00' }}>
+          {invitation.host_name} यांचे गणपती आमंत्रण
+        </h1>
+        <p className="text-amber-700 text-sm mb-2">{invitation.city}</p>
+        <div className="w-24 h-0.5 mx-auto mb-6" style={{ background: 'linear-gradient(90deg, transparent, rgba(212,160,23,0.5), transparent)' }} />
+        <p className="text-amber-800 text-sm leading-relaxed max-w-xs mx-auto mb-8">
+          हे आमंत्रण payment verification च्या प्रतीक्षेत आहे.<br />
+          Verification झाल्यावर हे invitation unlock होईल.
+        </p>
+        <div className="p-5 rounded-2xl mb-6 max-w-xs mx-auto"
+          style={{ background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(212,160,23,0.2)' }}>
+          <p className="text-xs text-amber-600 mb-3 font-semibold">⏳ Verification Timeline</p>
+          <div className="space-y-2 text-left">
+            <div className="flex items-center gap-2 text-xs text-amber-700">
+              <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+              Invitation created
+            </div>
+            <div className="flex items-center gap-2 text-xs text-amber-700">
+              <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+              Payment submitted
+            </div>
+            <div className="flex items-center gap-2 text-xs font-semibold" style={{ color: '#ff7300' }}>
+              <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
+                className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#ff7300' }} />
+              Admin verification in progress...
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <span className="w-2 h-2 rounded-full bg-gray-200 flex-shrink-0" />
+              Invitation unlock
+            </div>
+          </div>
+        </div>
+        <Link to="/" className="btn-saffron px-8 py-3">🏠 मुख्य पानावर जा</Link>
+      </motion.div>
+    </div>
   );
 }
 

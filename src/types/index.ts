@@ -9,6 +9,68 @@ export interface User {
   created_at: string;
 }
 
+// ─── PAYMENT TYPES ─────────────────────────────────────────────────────────
+
+export type PaymentStatus = 'PENDING' | 'PAID' | 'REJECTED' | 'REFUNDED';
+export type InvitationPaymentStatus = 'FREE' | 'PENDING' | 'PAID';
+export type PaymentProviderType = 'UPI_MANUAL' | 'RAZORPAY' | 'CASHFREE' | 'PHONEPE';
+
+export interface Payment {
+  id: string;
+  user_id?: string;
+  invitation_id: string;
+  amount: number;
+  currency: string;
+  transaction_id: string;
+  payment_screenshot_url?: string;
+  status: PaymentStatus;
+  rejection_reason?: string;
+  verified_by?: string;
+  verified_at?: string;
+  created_at: string;
+  updated_at: string;
+  // Joined fields
+  user?: Pick<User, 'id' | 'name' | 'email'>;
+  invitation?: Pick<Invitation, 'id' | 'slug' | 'host_name' | 'city'>;
+}
+
+export interface AppSetting {
+  id: string;
+  key: string;
+  value: string;
+  updated_by?: string;
+  updated_at: string;
+}
+
+export interface AdminLog {
+  id: string;
+  admin_id?: string;
+  action: string;
+  entity_type: string;
+  entity_id?: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface PaymentSettings {
+  invitation_price: number;
+  upi_id: string;
+  upi_payee_name: string;
+  payment_instructions: string;
+  support_contact: string;
+  payment_note: string;
+}
+
+export interface RevenueStats {
+  total_revenue: number;
+  today_revenue: number;
+  week_revenue: number;
+  month_revenue: number;
+  pending_count: number;
+  paid_count: number;
+  rejected_count: number;
+}
+
 export type InvitationType = 'individual' | 'family' | 'friends_group' | 'society' | 'organization';
 export type InvitationStatus = 'draft' | 'active' | 'visarjan' | 'archived';
 export type DurationDays = 1 | 3 | 5 | 7 | 10 | 'custom';
@@ -50,6 +112,18 @@ export interface Invitation {
   music_enabled: boolean;
   family_story?: string;
   status: InvitationStatus;
+  // Payment fields (migration 006)
+  payment_status?: InvitationPaymentStatus;
+  is_unlocked?: boolean;
+  is_public?: boolean;
+  payment_id?: string;
+  // RSVP settings (migration 007)
+  rsvp_enabled?: boolean;
+  rsvp_allow_maybe?: boolean;
+  rsvp_max_per_person?: number;
+  rsvp_allow_message?: boolean;
+  rsvp_show_public_count?: boolean;
+  rsvp_deadline?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -62,16 +136,39 @@ export interface Guest {
   created_at: string;
 }
 
-export type RSVPResponse = 'yes' | 'maybe' | 'no';
+export type RSVPStatus = 'COMING' | 'MAYBE' | 'NOT_ATTENDING';
+// Legacy alias — keep for any old references
+export type RSVPResponse = RSVPStatus;
 
 export interface RSVP {
   id: string;
   invitation_id: string;
-  guest_id?: string;
-  guest_name?: string;
-  response: RSVPResponse;
-  guest_count: number;
+  guest_token?: string;
+  session_key?: string;
+  guest_name: string;
+  status: RSVPStatus;
+  attendee_count: number;
+  message?: string;
   created_at: string;
+  updated_at: string;
+}
+
+export interface RSVPStats {
+  coming_count: number;
+  maybe_count: number;
+  not_count: number;
+  total_count: number;
+  confirmed_people: number;
+  possible_people: number;
+}
+
+export interface RSVPSettings {
+  rsvp_enabled: boolean;
+  rsvp_allow_maybe: boolean;
+  rsvp_max_per_person: number;
+  rsvp_allow_message: boolean;
+  rsvp_show_public_count: boolean;
+  rsvp_deadline: string | null;
 }
 
 export interface InvitationView {
