@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Copy, CheckCircle, Share2, Lock } from 'lucide-react';
 import { getWhatsAppShareUrl } from '../../lib/utils';
 import { showToast } from '../ui/Toaster';
@@ -91,10 +92,10 @@ ${url}
               Pay ₹50 to unlock WhatsApp sharing, copy link, and guest links
             </p>
             {paymentInvitationId && (
-              <a href={`/payment/${paymentInvitationId}`}
+              <Link to={`/payment/${paymentInvitationId}`}
                 className="btn-saffron inline-flex px-6 py-3 text-sm">
                 🔒 Pay ₹50 & Unlock
-              </a>
+              </Link>
             )}
           </div>
           {[{ icon: '📱', label: 'WhatsApp Share' }, { icon: '🔗', label: 'Copy Link' }, { icon: '✈️', label: 'Telegram' }].map(f => (
