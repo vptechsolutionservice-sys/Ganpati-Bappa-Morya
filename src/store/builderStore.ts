@@ -42,6 +42,7 @@ export const defaultBuilderState: BuilderState = {
 गणपती बाप्पा मोरया! 🙏`,
   guests: [],
   music_enabled: false,
+  music_url: '',
   slug: '',
   family_story: '',
   currentStep: 1,

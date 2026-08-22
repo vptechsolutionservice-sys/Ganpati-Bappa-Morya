@@ -28,9 +28,36 @@ const DECORATIONS: { key: keyof BuilderState; label: string; icon: string }[] = 
   { key: 'show_mandala', label: 'Mandala', icon: '🌀' },
 ];
 
+const SONGS = [
+  { id: '/songs/_Ekadantaya_Ganpati_Ringtone_(by Fringster.com).mp3', name: 'Ekadantaya' },
+  { id: '/songs/_Ekdantaya_Vakratundaya_Ganpati_Devotional_Song_Ringtone_(by Fringster.com).mp3', name: 'Vakratundaya Devotional' },
+  { id: '/songs/_Ganesh_Ji_Ganpati_Bappa_Ringtone_(by Fringster.com).mp3', name: 'Ganpati Bappa' },
+  { id: '/songs/_Marathi_Ganpati_Ringtone_(by Fringster.com).mp3', name: 'Marathi Ganpati' },
+];
+
 export default function Step3Design({ state, update }: Props) {
   const [uploading, setUploading] = useState(false);
+  const [playingSong, setPlayingSong] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const togglePlay = (url: string) => {
+    if (playingSong === url) {
+      audioRef.current?.pause();
+      setPlayingSong(null);
+    } else {
+      if (audioRef.current) {
+        audioRef.current.src = url;
+        audioRef.current.play();
+      } else {
+        const audio = new Audio(url);
+        audio.play();
+        audioRef.current = audio;
+        audio.addEventListener('ended', () => setPlayingSong(null));
+      }
+      setPlayingSong(url);
+    }
+  };
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -192,10 +219,10 @@ export default function Step3Design({ state, update }: Props) {
 
       {/* Music */}
       <div className="gold-card p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-bold font-devanagari" style={{ color: '#3d1f00' }}>🎵 Background Music</h3>
-            <p className="text-xs text-amber-600 mt-0.5">Soft Ganpati instrumental (user-controlled)</p>
+            <p className="text-xs text-amber-600 mt-0.5">Select a song to play in the background</p>
           </div>
           <button
             onClick={() => update({ music_enabled: !state.music_enabled })}
@@ -208,6 +235,41 @@ export default function Step3Design({ state, update }: Props) {
             }`} />
           </button>
         </div>
+
+        {state.music_enabled && (
+          <div className="mt-4 space-y-2">
+            {SONGS.map(song => (
+              <div
+                key={song.id}
+                className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                  state.music_url === song.id
+                    ? 'border-saffron-500 bg-saffron-50'
+                    : 'border-amber-200 bg-white hover:border-amber-300'
+                }`}
+                onClick={() => update({ music_url: song.id })}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                    state.music_url === song.id ? 'border-saffron-500' : 'border-amber-300'
+                  }`}>
+                    {state.music_url === song.id && <div className="w-2 h-2 rounded-full bg-saffron-500" />}
+                  </div>
+                  <span className="text-sm font-medium" style={{ color: '#3d1f00' }}>{song.name}</span>
+                </div>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    togglePlay(song.id);
+                  }}
+                  className="p-2 rounded-full hover:bg-amber-100 text-saffron-600"
+                >
+                  {playingSong === song.id ? '⏸️' : '▶️'}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -22,41 +22,34 @@ export default function InvitationCard({
   diyaCount = 0,
 }: Props) {
   const [musicPlaying, setMusicPlaying] = useState(false);
-  const audioRef = useRef<AudioContext | null>(null);
-  const oscillatorRef = useRef<OscillatorNode | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const bgImage = invitation.ganpati_image_url || '/images/ganpati-hero.jpg';
 
-  function playBellTone() {
-    // Web Audio API simple bell-like tone
-    if (!audioRef.current) {
-      audioRef.current = new AudioContext();
-    }
-    const ctx = audioRef.current;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.setValueAtTime(523, ctx.currentTime); // C5
-    osc.frequency.exponentialRampToValueAtTime(261, ctx.currentTime + 1);
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 1.5);
-  }
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, []);
 
   function toggleMusic() {
-    if (!audioRef.current) {
-      audioRef.current = new AudioContext();
-    }
     if (musicPlaying) {
-      oscillatorRef.current?.stop();
-      oscillatorRef.current = null;
+      audioRef.current?.pause();
       setMusicPlaying(false);
     } else {
-      playBellTone();
+      if (!audioRef.current) {
+        const songUrl = invitation.music_url || '/songs/_Marathi_Ganpati_Ringtone_(by Fringster.com).mp3';
+        const audio = new Audio(songUrl);
+        audio.loop = true;
+        audioRef.current = audio;
+      }
+      audioRef.current.play().catch(() => {
+        // Autoplay may be blocked if no user interaction
+      });
       setMusicPlaying(true);
-      setTimeout(() => setMusicPlaying(false), 2000);
     }
   }
 

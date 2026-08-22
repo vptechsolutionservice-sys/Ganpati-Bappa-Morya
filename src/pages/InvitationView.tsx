@@ -504,6 +504,7 @@ const DEMO_INVITATION: Invitation = {
   show_particles: true,
   show_mandala: true,
   music_enabled: true,
+  music_url: '/songs/_Marathi_Ganpati_Ringtone_(by Fringster.com).mp3',
   family_story: 'आमच्या घरी गेल्या 15 वर्षांपासून गणपती बाप्पांची स्थापना केली जाते. दरवर्षी संपूर्ण परिवार एकत्र येतो आणि बाप्पांचा उत्सव साजरा करतो.',
   status: 'active',
   created_at: new Date().toISOString(),

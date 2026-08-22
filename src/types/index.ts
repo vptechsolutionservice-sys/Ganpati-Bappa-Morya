@@ -111,6 +111,7 @@ export interface Invitation {
   show_particles: boolean;
   show_mandala: boolean;
   music_enabled: boolean;
+  music_url?: string;
   family_story?: string;
   status: InvitationStatus;
   // Payment fields (migration 006)
@@ -310,6 +311,7 @@ export interface BuilderState {
 
   // Step 7: Music
   music_enabled: boolean;
+  music_url: string;
 
   // Meta
   slug: string;
