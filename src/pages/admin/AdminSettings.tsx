@@ -128,14 +128,14 @@ export default function AdminSettings() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="gold-card p-6">
             <h2 className="font-bold text-base mb-5" style={{ color: '#3d1f00' }}>💰 Payment Settings</h2>
 
-            {!settings.upi_id && (
+            {!settings.upi_id && !settings.payment_qr_url && !qrPreview && (
               <div className="mb-5 flex items-start gap-3 p-4 rounded-xl"
                 style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)' }}>
                 <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-yellow-700">UPI ID not configured</p>
+                  <p className="text-sm font-semibold text-yellow-700">Payment not configured</p>
                   <p className="text-xs text-yellow-600 mt-0.5">
-                    Payment QR code will not be shown to users until UPI ID is set.
+                    Payment screen will be hidden until you set a UPI ID or upload a Custom QR.
                   </p>
                 </div>
               </div>

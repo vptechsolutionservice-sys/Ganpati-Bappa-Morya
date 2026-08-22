@@ -184,8 +184,9 @@ export default function PaymentPage() {
 
   const price = settings?.invitation_price || 50;
   const upiId = settings?.upi_id || '';
+  const qrUrl = settings?.payment_qr_url || '';
   const payeeName = settings?.upi_payee_name || 'Ganpati Invitation';
-  const configMissing = !upiId;
+  const configMissing = !upiId && !qrUrl;
 
   return (
     <div className="min-h-screen" style={{ background: 'radial-gradient(ellipse at top, #fff8f0 0%, #fdf0dc 60%, #fde8c8 100%)' }}>
@@ -265,20 +266,22 @@ export default function PaymentPage() {
             </div>
 
             {/* Copy UPI + Open App */}
-            <div className="grid grid-cols-2 gap-3 mt-5">
-              <button onClick={copyUpiId}
-                className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
-                style={{ background: copied ? 'rgba(22,163,74,0.1)' : 'rgba(255,115,0,0.08)', border: `1px solid ${copied ? '#16a34a' : 'rgba(255,115,0,0.3)'}`, color: copied ? '#16a34a' : '#ff6200' }}>
-                {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                {copied ? 'Copied!' : 'Copy UPI ID'}
-              </button>
-              <a href={upiUrl}
-                className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-white transition-all"
-                style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)' }}>
-                <Smartphone className="w-4 h-4" />
-                Open UPI App
-              </a>
-            </div>
+            {upiId && (
+              <div className="grid grid-cols-2 gap-3 mt-5">
+                <button onClick={copyUpiId}
+                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
+                  style={{ background: copied ? 'rgba(22,163,74,0.1)' : 'rgba(255,115,0,0.08)', border: `1px solid ${copied ? '#16a34a' : 'rgba(255,115,0,0.3)'}`, color: copied ? '#16a34a' : '#ff6200' }}>
+                  {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copied ? 'Copied!' : 'Copy UPI ID'}
+                </button>
+                <a href={upiUrl}
+                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-white transition-all"
+                  style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)' }}>
+                  <Smartphone className="w-4 h-4" />
+                  Open UPI App
+                </a>
+              </div>
+            )}
           </motion.div>
         )}
 
