@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, User, Globe } from 'lucide-react';
+import { X, Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { showToast } from '../ui/Toaster';
 
@@ -13,7 +13,7 @@ interface Props {
 type Tab = 'signin' | 'signup';
 
 export default function AuthModal({ open, onClose, onSuccess }: Props) {
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+  const { signInWithEmail, signUpWithEmail } = useAuth();
   const [tab, setTab] = useState<Tab>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,9 +51,7 @@ export default function AuthModal({ open, onClose, onSuccess }: Props) {
     }
   }
 
-  async function handleGoogle() {
-    await signInWithGoogle();
-  }
+
 
   if (!open) return null;
 
@@ -92,23 +90,6 @@ export default function AuthModal({ open, onClose, onSuccess }: Props) {
           </div>
 
           <div className="px-8 pb-8">
-            {/* Google button */}
-            <button
-              onClick={handleGoogle}
-              className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border-2 font-medium text-sm transition-all hover:bg-amber-50 mb-6"
-              style={{ borderColor: 'rgba(212,160,23,0.3)', color: '#3d1f00' }}
-            >
-              <Globe className="w-5 h-5 text-blue-500" />
-              Google ने Login करा
-            </button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex-1 h-px bg-amber-200" />
-              <span className="text-xs text-amber-500 font-medium">किंवा</span>
-              <div className="flex-1 h-px bg-amber-200" />
-            </div>
-
             {/* Tabs */}
             <div className="flex rounded-xl overflow-hidden border border-amber-200 mb-6">
               {(['signin', 'signup'] as Tab[]).map(t => (
