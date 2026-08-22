@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, User, LogOut, LayoutDashboard, Shield } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, Shield, Download } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import AuthModal from '../auth/AuthModal';
 import { cn } from '../../lib/utils';
@@ -11,10 +11,30 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    }
+  };
 
   return (
     <>
@@ -57,6 +77,15 @@ export default function Navbar() {
 
             {/* CTA + User */}
             <div className="flex items-center gap-3">
+              {deferredPrompt && (
+                <button 
+                  onClick={handleInstallClick}
+                  className="hidden md:flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full border border-saffron-500 text-saffron-600 hover:bg-saffron-50 transition-colors"
+                >
+                  <Download className="w-3 h-3" /> Install App
+                </button>
+              )}
+
               <Link to="/create" className="hidden sm:flex btn-saffron text-sm px-4 py-2">
                 🙏 आमंत्रण तयार करा
               </Link>
