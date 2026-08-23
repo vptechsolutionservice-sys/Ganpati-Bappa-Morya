@@ -62,7 +62,7 @@ export default function CreateInvitation() {
       case 1:
         return !!(state.host_name && state.city && state.address);
       case 2:
-        return !!(state.arrival_date && state.arrival_time && state.visarjan_date);
+        return true; // Auto-filled if blank on next()
       case 3:
         return !!state.template_id;
       case 4:
@@ -77,6 +77,14 @@ export default function CreateInvitation() {
   }
 
   function next() {
+    if (currentStep === 2) {
+      const today = new Date().toISOString().split('T')[0];
+      const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+      const partial: Partial<BuilderState> = {};
+      if (!state.arrival_date) partial.arrival_date = today;
+      if (!state.visarjan_date) partial.visarjan_date = nextWeek;
+      if (Object.keys(partial).length > 0) update(partial);
+    }
     if (!canAdvance()) {
       showToast('कृपया सर्व आवश्यक माहिती भरा.', 'error');
       return;

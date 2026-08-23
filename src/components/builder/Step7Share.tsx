@@ -182,6 +182,23 @@ export default function Step7Share({ state, saveInvitation }: Props) {
     );
   }
 
+  async function handlePayNow() {
+    if (state.savedInvitationId) {
+      navigate(`/payment/${state.savedInvitationId}`);
+      return;
+    }
+    if (saveInvitation) {
+      setLoading(true);
+      const res = await saveInvitation();
+      setLoading(false);
+      if (res?.invitationId) {
+        navigate(`/payment/${res.invitationId}`);
+      } else {
+        navigate('/payment/demo-invitation-2026');
+      }
+    }
+  }
+
   // ─── LOCKED STATE ──────────────────────────────────────────────
   return (
     <div className="space-y-6">
@@ -240,9 +257,8 @@ export default function Step7Share({ state, saveInvitation }: Props) {
             <p className="text-3xl font-bold mb-1" style={{ color: '#ff7300' }}>₹59</p>
             <p className="text-xs text-amber-500 mb-4">one-time • per invitation</p>
             <button
-              onClick={() => state.savedInvitationId && navigate(`/payment/${state.savedInvitationId}`)}
-              disabled={!state.savedInvitationId}
-              className="btn-saffron w-full py-4 text-base"
+              onClick={handlePayNow}
+              className="btn-saffron w-full py-4 text-base font-bold shadow-lg"
             >
               🔒 Pay ₹59 & Share My Invitation
             </button>
