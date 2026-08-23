@@ -35,10 +35,15 @@ export default function Navbar() {
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setDeferredPrompt(null);
+      try {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          setDeferredPrompt(null);
+        }
+      } catch (err) {
+        console.error('PWA install error:', err);
+        setInstallModalOpen(true);
       }
     } else {
       setInstallModalOpen(true);
@@ -186,7 +191,7 @@ export default function Navbar() {
                 </Link>
                 {!isStandalone && (
                   <button
-                    onClick={() => { setInstallModalOpen(true); setMenuOpen(false); }}
+                    onClick={() => { handleInstallClick(); setMenuOpen(false); }}
                     className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-saffron-500 bg-saffron-50 text-saffron-700 font-bold text-sm"
                   >
                     <Download className="w-4 h-4" /> 📲 ॲप फोनमध्ये इनस्टॉल करा
@@ -244,6 +249,26 @@ export default function Navbar() {
               </h3>
               <p className="text-xs text-amber-700 mb-4">Install App on your mobile phone Home Screen</p>
 
+              {deferredPrompt && (
+                <button
+                  onClick={async () => {
+                    try {
+                      deferredPrompt.prompt();
+                      const { outcome } = await deferredPrompt.userChoice;
+                      if (outcome === 'accepted') {
+                        setDeferredPrompt(null);
+                      }
+                    } catch (e) {
+                      console.error(e);
+                    }
+                    setInstallModalOpen(false);
+                  }}
+                  className="btn-saffron w-full py-2.5 text-sm mb-4 font-bold flex items-center justify-center gap-2 shadow-md"
+                >
+                  <Download className="w-4 h-4" /> ⚡ आताच इनस्टॉल करा (Install Now)
+                </button>
+              )}
+
               <div className="space-y-3 text-left text-xs text-amber-900 bg-amber-50/80 p-4 rounded-xl border border-amber-200 mb-5">
                 <div className="flex items-start gap-2">
                   <span className="font-bold text-saffron-600 text-sm">1.</span>
@@ -257,7 +282,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => setInstallModalOpen(false)}
-                className="btn-saffron w-full py-2.5 text-sm"
+                className="w-full py-2 text-xs text-amber-800 font-semibold border border-amber-300 rounded-xl hover:bg-amber-100 transition-colors"
               >
                 समजले (Got it) ✓
               </button>
