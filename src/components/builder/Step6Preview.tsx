@@ -12,7 +12,7 @@ interface Props {
 
 export default function Step6Preview({ state }: Props) {
   const navigate = useNavigate();
-  const [price, setPrice] = useState(50);
+  const [price, setPrice] = useState(59);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [checkingPayment, setCheckingPayment] = useState(false);

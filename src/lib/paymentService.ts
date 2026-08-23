@@ -16,6 +16,7 @@ interface SubmitPaymentInput {
   transactionId: string;
   screenshotUrl?: string;
   amount?: number;
+  status?: PaymentStatus;
 }
 
 // ─── SETTINGS ────────────────────────────────────────────────
@@ -35,23 +36,23 @@ export async function getPaymentSettings(): Promise<PaymentSettings> {
 
   if (error || !data) {
     return {
-      invitation_price: 50,
+      invitation_price: 59,
       upi_id: '',
       upi_payee_name: '',
-      payment_instructions: '1. QR code scan करा\n2. ₹50 pay करा\n3. Transaction ID copy करा\n4. खाली enter करा\n5. Submit करा',
+      payment_instructions: 'Pay ₹59 securely with Razorpay to instantly unlock sharing.',
       support_contact: '',
-      payment_note: 'Payment manually verified होते.',
+      payment_note: 'Instant unlock with Razorpay.',
     };
   }
 
   const map = Object.fromEntries(data.map(d => [d.key, d.value]));
   return {
-    invitation_price: Number(map.invitation_price) || 50,
+    invitation_price: Number(map.invitation_price) || 59,
     upi_id: map.upi_id || '',
     upi_payee_name: map.upi_payee_name || '',
-    payment_instructions: map.payment_instructions || '',
+    payment_instructions: map.payment_instructions || 'Pay ₹59 securely with Razorpay to instantly unlock sharing.',
     support_contact: map.support_contact || '',
-    payment_note: map.payment_note || '',
+    payment_note: map.payment_note || 'Instant unlock with Razorpay.',
     payment_qr_url: map.payment_qr_url || undefined,
   };
 }
@@ -174,7 +175,7 @@ export async function submitPayment(input: SubmitPaymentInput): Promise<{ paymen
       currency: 'INR',
       transaction_id: trimmedTxId,
       payment_screenshot_url: screenshotUrl || null,
-      status: 'PENDING',
+      status: input.status || 'PENDING',
     })
     .select('*')
     .single();
@@ -184,11 +185,11 @@ export async function submitPayment(input: SubmitPaymentInput): Promise<{ paymen
     return { payment: null, error: error?.message || 'Payment submission failed. Please try again.' };
   }
 
-  // Update invitation to payment_status = PENDING, payment_id
+  // Update invitation to payment_status = input.status or PENDING, payment_id
   await supabase
     .from('invitations')
     .update({
-      payment_status: 'PENDING',
+      payment_status: input.status || 'PENDING',
       payment_id: data.id,
       updated_at: new Date().toISOString(),
     })

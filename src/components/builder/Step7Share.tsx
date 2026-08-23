@@ -237,14 +237,14 @@ export default function Step7Share({ state, saveInvitation }: Props) {
           )}
 
           <div className="mt-6 pt-5 border-t text-center" style={{ borderColor: 'rgba(212,160,23,0.2)' }}>
-            <p className="text-3xl font-bold mb-1" style={{ color: '#ff7300' }}>₹50</p>
+            <p className="text-3xl font-bold mb-1" style={{ color: '#ff7300' }}>₹59</p>
             <p className="text-xs text-amber-500 mb-4">one-time • per invitation</p>
             <button
               onClick={() => state.savedInvitationId && navigate(`/payment/${state.savedInvitationId}`)}
               disabled={!state.savedInvitationId}
               className="btn-saffron w-full py-4 text-base"
             >
-              🔒 Pay ₹50 & Share My Invitation
+              🔒 Pay ₹59 & Share My Invitation
             </button>
             <p className="text-xs text-amber-500 mt-3 font-devanagari">
               गणपती बाप्पा मोरया! मंगलमूर्ती मोरया! 🙏

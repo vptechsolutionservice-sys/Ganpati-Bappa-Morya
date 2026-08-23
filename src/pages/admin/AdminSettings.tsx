@@ -8,9 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { uploadPaymentQRCode } from '../../lib/paymentService';
 
 const SETTINGS_CONFIG = [
-  { key: 'invitation_price', label: 'Invitation Price (₹)', type: 'number', placeholder: '50', hint: 'Default ₹50 per invitation' },
-  { key: 'upi_id', label: 'UPI ID', type: 'text', placeholder: 'yourname@upi', hint: 'The UPI ID customers will pay to (e.g. name@paytm, 9999999999@upi)' },
-  { key: 'upi_payee_name', label: 'UPI Payee Name', type: 'text', placeholder: 'Ganpati Invitation', hint: 'Name shown on UPI payment screen' },
+  { key: 'invitation_price', label: 'Invitation Price (₹)', type: 'number', placeholder: '59', hint: 'Default ₹59 per invitation' },
   { key: 'support_contact', label: 'Support Contact', type: 'text', placeholder: 'WhatsApp number or email', hint: 'Shown to users if payment has issues' },
 ];
 
