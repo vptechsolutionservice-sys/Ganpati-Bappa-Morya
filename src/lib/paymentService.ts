@@ -82,7 +82,7 @@ export async function isTransactionIdUsed(transactionId: string): Promise<boolea
     .from('payments')
     .select('id')
     .eq('transaction_id', transactionId.trim())
-    .single();
+    .maybeSingle();
   return !!data;
 }
 
@@ -204,7 +204,7 @@ export async function getPaymentStatus(paymentId: string): Promise<Payment | nul
     .from('payments')
     .select('*')
     .eq('id', paymentId)
-    .single();
+    .maybeSingle();
   return data || null;
 }
 
@@ -216,7 +216,7 @@ export async function getLatestPaymentForInvitation(invitationId: string): Promi
     .eq('invitation_id', invitationId)
     .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
   return data || null;
 }
 

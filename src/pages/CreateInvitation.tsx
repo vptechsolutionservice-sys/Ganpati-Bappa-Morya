@@ -194,7 +194,7 @@ export default function CreateInvitation() {
     <Step3Design state={state} update={update} />,
     <Step4Message state={state} update={update} />,
     <Step5Personalize state={state} update={update} />,
-    <Step6Preview state={state} />,
+    <Step6Preview state={state} saveInvitation={saveToDatabase} />,
     <Step7Share state={state} saveInvitation={saveToDatabase} />,
   ];
 

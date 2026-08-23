@@ -4,22 +4,20 @@ import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
 import type { BuilderState } from '../../types';
 import InvitationCard from '../ganpati/InvitationCard';
-import { getPaymentSettings, getLatestPaymentForInvitation } from '../../lib/paymentService';
+import { getLatestPaymentForInvitation } from '../../lib/paymentService';
 
 interface Props {
   state: BuilderState;
+  saveInvitation?: () => Promise<{ slug: string; invitationId: string } | null>;
 }
 
-export default function Step6Preview({ state }: Props) {
+export default function Step6Preview({ state, saveInvitation }: Props) {
   const navigate = useNavigate();
-  const [price, setPrice] = useState(59);
+  const price = 59; // Fixed ₹59
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [checkingPayment, setCheckingPayment] = useState(false);
-
-  useEffect(() => {
-    getPaymentSettings().then(s => setPrice(s.invitation_price));
-  }, []);
+  const [savingForPayment, setSavingForPayment] = useState(false);
 
   useEffect(() => {
     if (state.savedInvitationId) {
@@ -75,9 +73,18 @@ export default function Step6Preview({ state }: Props) {
     updated_at: new Date().toISOString(),
   };
 
-  function handlePayNow() {
+  async function handlePayNow() {
     if (state.savedInvitationId) {
       navigate(`/payment/${state.savedInvitationId}`);
+      return;
+    }
+    if (saveInvitation) {
+      setSavingForPayment(true);
+      const res = await saveInvitation();
+      setSavingForPayment(false);
+      if (res?.invitationId) {
+        navigate(`/payment/${res.invitationId}`);
+      }
     }
   }
 
@@ -187,19 +194,13 @@ export default function Step6Preview({ state }: Props) {
 
             <button
               onClick={handlePayNow}
-              disabled={!state.savedInvitationId}
-              className="btn-saffron w-full py-4 text-base"
+              disabled={savingForPayment}
+              className="btn-saffron w-full py-4 text-base font-bold shadow-lg"
             >
-              {!state.savedInvitationId
-                ? '⌛ Saving invitation...'
+              {savingForPayment
+                ? '⌛ Saving & Opening Payment...'
                 : `🔒 Pay ₹${price} & Share`}
             </button>
-
-            {!state.savedInvitationId && (
-              <p className="text-xs text-center text-amber-500 mt-2">
-                Please click "Finalize & Share" first to save your invitation
-              </p>
-            )}
 
             <p className="text-xs text-center text-amber-500 mt-3 font-devanagari">
               फक्त आमंत्रण नाही… बाप्पांच्या आगमनाचा एक सुंदर अनुभव. 🙏❤️
