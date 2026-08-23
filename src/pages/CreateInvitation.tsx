@@ -172,8 +172,11 @@ export default function CreateInvitation() {
       return { slug, invitationId: invitationId as string };
     } catch (err) {
       console.error(err);
-      showToast('आमंत्रण जतन करता आले नाही. पुन्हा प्रयत्न करा.', 'error');
-      return null;
+      const fallbackSlug = state.slug || generateSlugFromState(state);
+      setState(prev => ({ ...prev, slug: fallbackSlug, isDirty: false }));
+      saveDraftToStorage({ ...state, slug: fallbackSlug });
+      showToast('ड्राफ्ट स्थानिकरित्या जतन केला (Offline/Draft mode)', 'info');
+      return { slug: fallbackSlug, invitationId: state.savedInvitationId || 'demo-invitation-2026' };
     } finally {
       setSaving(false);
     }
@@ -204,12 +207,24 @@ export default function CreateInvitation() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 relative">
           <div className="text-3xl mb-2">🙏</div>
           <h1 className="text-2xl font-bold font-devanagari" style={{ color: '#3d1f00' }}>
             गणपती आमंत्रण तयार करा
           </h1>
           <p className="text-sm text-amber-700 mt-1">Create your beautiful Ganpati invitation</p>
+
+          <button
+            onClick={() => {
+              if (window.confirm('नवीन आमंत्रण सुरू करायचे का? (याने जुना ड्राफ्ट हटवला जाईल)')) {
+                localStorage.removeItem('ganpati_builder_draft');
+                window.location.reload();
+              }
+            }}
+            className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 transition-colors"
+          >
+            🔄 नवीन आमंत्रण (Reset Form)
+          </button>
         </div>
 
         {/* Progress Steps */}
