@@ -9,23 +9,32 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'images/*', 'songs/*'],
+      devOptions: {
+        enabled: true,
+      },
       manifest: {
-        name: 'Ganpati Invitation',
-        short_name: 'Ganpati',
+        id: '/',
+        name: 'Ganpati Invitation — बाप्पांचे आमंत्रण',
+        short_name: 'गणपती आमंत्रण',
         description: 'Create beautiful personalized Ganpati invitations.',
         theme_color: '#fdf0dc',
         background_color: '#fdf0dc',
         display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: 'favicon.svg',
             sizes: '192x192',
-            type: 'image/svg+xml'
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
           },
           {
             src: 'favicon.svg',
             sizes: '512x512',
-            type: 'image/svg+xml'
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
           }
         ]
       }
