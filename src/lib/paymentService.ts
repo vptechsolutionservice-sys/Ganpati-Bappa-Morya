@@ -68,7 +68,7 @@ export function buildUpiUrl(settings: PaymentSettings, reference: string): strin
   const params = new URLSearchParams({
     pa: settings.upi_id,
     pn: settings.upi_payee_name || 'Ganpati Invitation',
-    am: String(settings.invitation_price),
+    am: Number(settings.invitation_price).toFixed(2),
     cu: 'INR',
     tn: `Ganpati Invitation - ${reference}`,
   });
