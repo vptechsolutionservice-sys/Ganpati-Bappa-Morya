@@ -68,11 +68,11 @@ export function buildUpiUrl(settings: PaymentSettings, reference: string): strin
   const params = new URLSearchParams({
     pa: settings.upi_id,
     pn: settings.upi_payee_name || 'Ganpati Invitation',
-    am: Number(settings.invitation_price).toFixed(2),
     cu: 'INR',
     tn: `Ganpati Invitation - ${reference}`,
   });
-  return `upi://pay?${params.toString()}`;
+  // Replace '+' with '%20' as some UPI apps do not support '+' for spaces
+  return `upi://pay?${params.toString().replace(/\+/g, '%20')}`;
 }
 
 // ─── DUPLICATE TRANSACTION ID CHECK ──────────────────────────
